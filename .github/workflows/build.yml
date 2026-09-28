@@ -80,6 +80,13 @@ jobs:
           mkdir -p wine/build-macos
           cd wine/build-macos
           ../configure --enable-win64 --without-x --without-freetype || true
+          # Generate the widl headers (objidlbase.h, dwrite.h, ...) into
+          # build-macos/include. win32u's ntuser_private.h and the dwrite
+          # unixlib include them; without this, 24 of 46 win32u objects and
+          # dwrite_unixlib fail to compile and the app links against the
+          # no-op win32u_unix_lib_init stub.
+          make -j"$(sysctl -n hw.ncpu)" tools/widl/all
+          make -j"$(sysctl -n hw.ncpu)" include/all
           # Ensure config.h exists even if configure exited early
           mkdir -p include
           if [ ! -f "include/config.h" ]; then
