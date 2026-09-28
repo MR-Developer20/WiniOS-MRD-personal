@@ -59,6 +59,8 @@ compile_one() {
         SUCCEEDED=$((SUCCEEDED + 1))
     else
         echo "FAILED"
+        # Surface the first compiler errors so CI logs show why.
+        grep -m 8 -E "error:|fatal error:" "$OBJ_DIR/$name.err" | sed "s/^/      /"
         FAILED=$((FAILED + 1))
         FAILED_FILES="$FAILED_FILES $name"
     fi
